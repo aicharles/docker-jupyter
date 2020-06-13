@@ -1,0 +1,10 @@
+jupyter/minimal-notebook
+
+docker jupyter
+
+docker run -p 8888:8888  -v "$HOME/Documents":/home/jovyan/work -e JUPYTER_ENABLE_LAB=yes --name jupyterlab jupyter/minimal-notebook
+
+docker container run -p 8888:8888 -d --name jupyterlab  jupyter/base-notebook
+
+
+docker container run -p 8888: 8888 -d -n jupyterlab  jupyter/base-notebook
