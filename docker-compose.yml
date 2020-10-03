@@ -7,8 +7,9 @@ services:
     environment:
       GRANT_SUDO: "yes"
       JUPYTER_ENABLE_LAB: "yes"
+      AWS_SHARED_CREDENTIALS_FILE: "/home/jovyan/.aws/credentials"
     volumes:
-      - $HOME:/home/jovyan/work
+      - $HOME:/home/jovyan/
     ports:
       - "8888:8888"
     user: root

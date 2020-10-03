@@ -4,43 +4,46 @@ FROM $BASE_CONTAINER
 
 USER root
 
+
 # Install all OS dependencies for fully functional notebook server
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    curl \
     build-essential \
-    emacs \
+    openssl \
+    libssl-dev \
+    vim-tiny \
     git \
     inkscape \
-    jed \
     libsm6 \
     libxext-dev \
     libxrender1 \
     lmodern \
     netcat \
-    python-dev \
-    # ---- snowflake stuff ---- #
-    libssl-dev \
-    libffi-dev \
     # ---- nbconvert dependencies ----
     texlive-xetex \
     texlive-fonts-recommended \
-    texlive-generic-recommended \
-    # Optional dependency
-    texlive-fonts-extra \
+    texlive-plain-generic \
     # ----
     tzdata \
     unzip \
-    nano \
-    postgresql libpq-dev postgresql-client postgresql-client-common \
+    nano-tiny \
+    mysql-server \
+    default-libmysqlclient-dev \
+    libpq-dev postgresql \
+    software-properties-common \
+    curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
-    && apt-get install -y nodejs
+RUN add-apt-repository ppa:deadsnakes/ppa && apt update && apt install python3.9 python3.9-distutils python3.9-dev -y
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip && ./aws/install \
     && rm -rf aws
+
+RUN apt-get update -yq \
+    && apt-get -yq install gnupg ca-certificates \
+    && curl -L https://deb.nodesource.com/setup_14.x | bash \
+    && apt-get update -yq \
+    && apt-get install -yq nodejs
 
 RUN cp /usr/bin/node /usr/bin/node_bak && rm /usr/bin/node \
     && ln -s /usr/bin/nodejs /usr/bin/node \
@@ -48,10 +51,22 @@ RUN cp /usr/bin/node /usr/bin/node_bak && rm /usr/bin/node \
     && jupyter lab build --minimize=False
 
 RUN pip install pandas snowflake-sqlalchemy slackclient xlrd matplotlib \
-    seaborn plotly "ipywidgets>=7.5" snowflake-ingest psycopg2
+    seaborn plotly "ipywidgets>=7.5" snowflake-ingest psycopg2 mysql-connector mysqlclient \
+    paramiko ipykernel
 
 RUN jupyter labextension install jupyterlab-plotly --no-build
 
 RUN jupyter lab build --minimize=False
+
+RUN curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py &&  \
+    python3.9 get-pip.py && python3.9 -m pip install ipykernel && \
+    python3.9 -m ipykernel install --name dlwp --display-name="Python3.9"
+
+RUN  apt-get update && apt-get install -y libaio1 \
+    && curl https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip  -o /opt/oracle.zip
+
+ENV ORACLE_HOME=/opt/oracle/instantclient_21_1
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1
+
 
 USER $NB_UID
