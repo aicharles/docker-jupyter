@@ -4,7 +4,6 @@ FROM $BASE_CONTAINER
 
 USER root
 
-
 # Install all OS dependencies for fully functional notebook server
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
@@ -50,8 +49,8 @@ RUN cp /usr/bin/node /usr/bin/node_bak && rm /usr/bin/node \
     && jupyter lab clean \
     && jupyter lab build --minimize=False
 
-RUN pip install pandas snowflake-sqlalchemy slackclient xlrd matplotlib \
-    seaborn plotly "ipywidgets>=7.5" snowflake-ingest psycopg2 mysql-connector mysqlclient \
+RUN pip install pandas xlrd matplotlib \
+    seaborn plotly "ipywidgets>=7.5" psycopg2 mysqlclient \
     paramiko ipykernel
 
 RUN jupyter labextension install jupyterlab-plotly --no-build
@@ -61,12 +60,5 @@ RUN jupyter lab build --minimize=False
 RUN curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py &&  \
     python3.9 get-pip.py && python3.9 -m pip install ipykernel && \
     python3.9 -m ipykernel install --name dlwp --display-name="Python3.9"
-
-RUN  apt-get update && apt-get install -y libaio1 \
-    && curl https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip  -o /opt/oracle.zip
-
-ENV ORACLE_HOME=/opt/oracle/instantclient_21_1
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_21_1
-
 
 USER $NB_UID

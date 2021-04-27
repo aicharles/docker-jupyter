@@ -10,6 +10,8 @@ services:
       AWS_SHARED_CREDENTIALS_FILE: "/home/jovyan/.aws/credentials"
     volumes:
       - $HOME:/home/jovyan/
+      - $HOME/.aws/credentials:/home/jovyan/.aws/credentials
     ports:
       - "8888:8888"
     user: root
+    platform: linux/arm64
