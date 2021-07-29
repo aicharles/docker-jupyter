@@ -1,5 +1,5 @@
 # slightly modified from https://github.com/jupyter/docker-stacks/blob/master/minimal-notebook/Dockerfile
-ARG BASE_CONTAINER=jupyter/base-notebook
+ARG BASE_CONTAINER=jupyter/base-notebook:python-3.8.8
 FROM $BASE_CONTAINER
 
 USER root
@@ -49,9 +49,7 @@ RUN cp /usr/bin/node /usr/bin/node_bak && rm /usr/bin/node \
     && jupyter lab clean \
     && jupyter lab build --minimize=False
 
-RUN pip install pandas xlrd matplotlib \
-    seaborn plotly "ipywidgets>=7.5" psycopg2 mysqlclient \
-    paramiko ipykernel
+RUN pip install "ipywidgets>=7.5" ipykernel
 
 RUN jupyter labextension install jupyterlab-plotly --no-build
 
@@ -60,5 +58,9 @@ RUN jupyter lab build --minimize=False
 RUN curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py &&  \
     python3.9 get-pip.py && python3.9 -m pip install ipykernel && \
     python3.9 -m ipykernel install --name dlwp --display-name="Python3.9"
+
+COPY ./requirements.txt /requirements.txt
+
+RUN pip install -r /requirements.txt
 
 USER $NB_UID

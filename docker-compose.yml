@@ -14,4 +14,3 @@ services:
     ports:
       - "8888:8888"
     user: root
-    platform: linux/arm64
